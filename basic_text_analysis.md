@@ -67,12 +67,12 @@ document.
 We check the words with the highest frequency in order to and plot them
 on a graph.
 
-![](GME_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](basic-text-analysis-r/unnamed-chunk-4-1.png)<!-- -->
 
 We now focus on posts containing the word GME. The below graph shows the
 evolution of the number of posts containing the word GME over time.
 
-![](GME_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](basic-text-analysis-r/unnamed-chunk-5-1.png)<!-- -->
 
 We finish our review by plotting a network to highlight which words are
 more often linked to GME. We could also have used a clustering
@@ -80,4 +80,4 @@ algorithm, but we have opted to a graph network for visualization
 purposes. We can observe below that GME is often linked to the words
 “AMC”, buy" and “hold”.
 
-![](GME_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](basic-text-analysis-r/unnamed-chunk-6-1.png)<!-- -->
