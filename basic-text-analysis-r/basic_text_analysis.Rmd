@@ -1,0 +1,130 @@
+---
+title: "Wallstreetbets Reddit Analysis"
+author: "Rodrigo Durso"
+date: "3/31/2021"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE, message=FALSE)
+library(dplyr)
+library(ggplot2)
+setwd("~/Project")
+library(knitr)
+wstbets <- read.csv("r_wallstreetbets_posts.csv")[ ,c('title', 'created_utc')]
+
+wstbets$created_utc <- as.Date(as.POSIXct(wstbets$created_utc, origin="1970-01-01")) 
+
+wstbets.recent <- subset(wstbets, format(as.Date(created_utc),"%Y")>=2019)
+#Take a sample of 10,000 posts
+set.seed(165)
+smp <- sample(1:nrow(wstbets.recent), 10000)
+wstbets.smp <- wstbets.recent[smp,]
+```
+
+## Wallstreetbets Reddit Analysis
+
+The purpose of this document is to analyze the posts in the subreddit wallstreetbets from January 2019 to February 2021. The dataset is available at https://www.kaggle.com/unanimad/reddit-rwallstreetbets. The dataset contains several variables, but for the purpose of this document we are taking into account the following ones:
+
+* title: the title of the post.
+* created_utc: date of the post publication.
+
+We start by taking a sample of 10,000 observations. Next, we convert the vector containing the title of the post to a corpus, which is just a collection of text documents.
+```{r }
+library(tm)
+
+corpus <- Corpus(VectorSource(wstbets.smp$title))
+corpus <- tm_map(corpus, function(cps) iconv(cps, to='UTF-8', sub='byte')) 
+
+corpus <- tm_map(corpus, stemDocument, language = "english")
+corpus <- tm_map(corpus, removeWords, stopwords('english'))
+
+
+corpus <- tm_map(corpus, stripWhitespace)
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, removeNumbers)
+```
+
+Finally, we modify the corpus by stemming and removing punctuations, white spaces and stop words. As an example, we compare a resulting text following the text transformation:
+
+* Weekend Discuss Thread Weekend October
+
+With the text prior to the transformation:
+
+* Weekend Discussion Thread for the Weekend of October 16, 2020
+
+We then convert the corpus to a Term Document Matrix, which is a representation of our text documents in a matrix of numbers. The below table shows a subset of the Term Document Matrix. 
+
+```{r}
+tdm <- DocumentTermMatrix(corpus)
+kable(as.matrix(tdm)[1:15,1:10])
+```
+
+We can observe below that we are working with a highly dimensional dataset with over 9,000 dimensions. 
+
+```{r}
+dimensions <- as.table(dim(tdm))
+dimnames(dimensions) <- list(c("No. of Documents","Dimensions"))
+kable(dimensions)
+tdm = removeSparseTerms(tdm, 0.98)
+```
+
+As a result, we remove the rare words to reduce the dimensionality in order to make matrix operations feasible. There are other problems related to multidimensionality in document analysis, in particular distance based clustering, but that is outside of the scope of this document. 
+
+
+We check the words with the highest frequency in order to and plot them on a graph.
+
+```{r}
+tdm2 <- as.matrix(tdm)
+frequency <- colSums(tdm2)
+frequency <- sort(frequency, decreasing=TRUE)
+
+frequency <- frequency[frequency>100]
+dfr <- as.data.frame(frequency)
+dfr <- cbind(word = rownames(dfr), dfr)
+dfr%>%
+  arrange(frequency) %>% 
+  mutate(word=factor(word, levels=word)) %>%  
+  ggplot(aes(x = word, y =  frequency))+
+  geom_col( fill="#f68060", alpha=.6,width = .7) + theme_bw() + coord_flip()
+```
+
+We now focus on posts containing the word GME. The below graph shows the evolution of the number of posts containing the word GME over time.
+
+```{r}
+gme.tdm <- tdm2[tdm2[, "gme"] >= 1,]
+gme.tdm[gme.tdm>=1] = 1
+#Get post list
+gme.tl <- as.numeric(attributes(tdm2[tdm2[, "gme"] >= 1,])$dimnames$Docs)
+
+#Aggregate by date
+gme.count <- aggregate(x = wstbets.smp$title[gme.tl],
+                     FUN = length,
+                     by = list(Group.date = wstbets.smp$created_utc[gme.tl]))
+
+ggplot(gme.count,aes(x = Group.date, y =  x))+
+  geom_col(width=3) + theme_bw() + xlab("Date") + ylab("Frequency") 
+```
+
+We finish our review by plotting a network to highlight which words are more often linked to GME. We could also have used a clustering algorithm, but we have opted to a graph network for visualization purposes. We can observe below that GME is often linked to the words "AMC", buy" and "hold". 
+
+```{r echo=FALSE, fig.height=25, fig.width=40}
+# Graph Cluster
+library(igraph)
+library(ggraph)
+
+
+gme.inc <- t(gme.tdm) %*% gme.tdm
+
+network <- graph_from_adjacency_matrix(gme.inc, weighted = TRUE, mode="undirected", diag = FALSE)
+
+gme.diag <- diag(gme.inc)
+
+E(network)$width <- E(network)$weight
+V(network)$nsize <- sqrt(as.numeric(gme.diag))*20
+
+plot(network, vertex.size=log(gme.diag)*1.5, rescale=FALSE, vertex.label.cex=4)
+```
+
+
