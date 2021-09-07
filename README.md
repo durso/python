@@ -1,4 +1,7 @@
 # Text Analysis using Python and R
+## Keras Binary Text Classification with R
+
+## Basic Text Analysis
 ### Python Implementation
 
 Plots produced by basic_text_analysis.py
