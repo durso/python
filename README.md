@@ -3,7 +3,7 @@
 
 Plots produced by the script
 
-![Learning curve](https://github.com/durso/text-analysis/blob/main/img/keras_binary.png?raw=true)
+![Learning curve](https://github.com/durso/text-analysis/blob/main/img/keras_binary.PNG?raw=true)
 
 ## Basic Text Analysis
 ### Python Implementation
