@@ -1,6 +1,10 @@
 # Text Analysis using Python and R
 ## Keras Binary Text Classification with R
 
+Plots produced by the script
+
+![Learning curve](https://github.com/durso/text-analysis/blob/main/img/keras_binary.png?raw=true)
+
 ## Basic Text Analysis
 ### Python Implementation
 
