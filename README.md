@@ -1,4 +1,10 @@
 # Text Analysis using Python and R
+## Topic Extraction with Python
+
+Plots produced by the script topic_extraction_employee_reviews.py 
+
+![Top words per Topic](https://github.com/durso/text-analysis/blob/main/img/Employee_review.PNG?raw=true)
+
 ## Keras Binary Text Classification with R
 
 Plots produced by the script keras_binary_text_classification.R
