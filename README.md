@@ -3,7 +3,7 @@
 
 Plots produced by the script topic_extraction_employee_reviews.py 
 
-![Top words per Topic](https://github.com/durso/text-analysis/blob/main/img/Employee_review.PNG?raw=true)
+![Top words per Topic](https://github.com/durso/text-analysis/blob/main/img/Employee_review.png?raw=true)
 
 ## Keras Binary Text Classification with R
 
