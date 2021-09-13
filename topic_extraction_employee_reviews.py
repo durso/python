@@ -79,18 +79,18 @@ df_data = []
 for index,topic in enumerate(nmf.components_):
     top_words_idx = topic.argsort()[:-n-1:-1]
     top_words = [feature_names[i] for i in top_words_idx]
-    tfidf= topic[top_words_idx].tolist()
-    df_data.append([index,top_words,tfidf])
+    H= topic[top_words_idx].tolist()
+    df_data.append([index,top_words,H])
 
     
 index = sum([[item[0]] *10 for item in df_data],[])
 words = sum([item[1] for item in df_data],[])
-tfidf = sum([item[2] for item in df_data],[])
+H = sum([item[2] for item in df_data],[])
 
 #print topic, topwords, tfidf
-top_words = pd.DataFrame({"topic":index,"words":words,"tfidf":tfidf})
+top_words = pd.DataFrame({"topic":index,"words":words,"H":H})
 color=["red","blue","green","black","grey"]
 #Plot words
 plt_color = sum([[item] *10 for item in color],[])
 
-top_words.plot.bar(x="words",y="tfidf",color = plt_color,legend=False,figsize=(10,10))
+top_words.plot.bar(x="words",y="H",color = plt_color,legend=False,figsize=(10,10))
